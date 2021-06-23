@@ -144,6 +144,8 @@
   <ItemGroup>
     <ClInclude Include="6502Declarations.h" />
     <ClInclude Include="6502Functions.h" />
+    <ClInclude Include="TestingModule.h" />
+    <ClInclude Include="Tests.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

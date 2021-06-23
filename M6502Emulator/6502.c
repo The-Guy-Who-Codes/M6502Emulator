@@ -1,12 +1,14 @@
 #include "6502Declarations.h"
 #include "6502Functions.h"
-
+#include "Tests.h"
 
 
 int main() {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     Mem mem;
     CPU cpu;
     reset(&cpu, &mem);
+#if 0
     // test program
     
     cpu.X = 0xFF;
@@ -18,5 +20,6 @@ int main() {
     int cycles = 4;
     execute(&cycles, &cpu, &mem);
     printf("A: %x\nX: %x\nY: %x\n", cpu.A, cpu.X, cpu.Y);
+#endif
     return 0;
 }
