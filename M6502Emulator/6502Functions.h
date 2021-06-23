@@ -29,7 +29,8 @@ static inline Byte readByte(uint32_t* cycles, struct Mem* mem, struct CPU* cpu, 
 
 static inline void setLoadFlags(CPU* cpu) {
     cpu->Z = (cpu->A == 0); // set if A == 0
-    cpu->N = (cpu->A & 0b10000000) > 0; // set if Bit 7 of A is set
+    cpu->N = (cpu->A & (0b1 << 7));
+    //cpu->N = (cpu->A & 0b10000000) > 0; // set if Bit 7 of A is set
 }
 
 void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
@@ -80,6 +81,7 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             ZPAddress += cpu->X;
             (*cycles)--; // offset for the addition operation
             cpu->A = readByte(cycles, mem, cpu, ZPAddress);
+            setLoadFlags(cpu);
         } break;
 
         case INS_LDY_ZX: {
@@ -87,6 +89,7 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             ZPAddress += cpu->X;
             (*cycles)--;
             cpu->Y = readByte(cycles, mem, cpu, ZPAddress);
+            setLoadFlags(cpu);
         } break;
 
         default: printf("[ERROR]: Instruction Not Handled: %d\n", Instruction); break;

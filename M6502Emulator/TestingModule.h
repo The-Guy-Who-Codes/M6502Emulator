@@ -46,3 +46,7 @@ void TEST_EQ(int val1, int val2, char* testName, HANDLE* hConsole) {
         TextWhite;
     }
 }
+
+void NEW_TEST() {
+    printf("-----------------------------------\n");
+}

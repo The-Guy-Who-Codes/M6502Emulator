@@ -21,5 +21,8 @@ int main() {
     execute(&cycles, &cpu, &mem);
     printf("A: %x\nX: %x\nY: %x\n", cpu.A, cpu.X, cpu.Y);
 #endif
+    T_LDA_IM(&cpu, &mem, hConsole);
+    T_LDX_IM(&cpu, &mem, hConsole);
+
     return 0;
 }
