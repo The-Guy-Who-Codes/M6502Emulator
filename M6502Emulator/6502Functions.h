@@ -27,9 +27,9 @@ static inline Byte readByte(uint32_t* cycles, struct Mem* mem, struct CPU* cpu, 
     return Data;
 }
 
-static inline void setLoadFlags(CPU* cpu) {
-    cpu->Z = (cpu->A == 0); // set if A == 0
-    cpu->N = (cpu->A & (0b1 << 7));
+static inline void setLoadFlags(CPU* cpu, Byte* regValue) {
+    cpu->Z = (regValue == 0); // set if A == 0
+    cpu->N = (((*regValue) & (1 << 7)) >> 7);
     //cpu->N = (cpu->A & 0b10000000) > 0; // set if Bit 7 of A is set
 }
 
@@ -43,37 +43,37 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
         case INS_LDA_IM: {
             Byte Value = fetchByte(cycles, mem, cpu);
             cpu->A = Value;
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->A);
         } break;
 
         case INS_LDX_IM: {
             Byte Value = fetchByte(cycles, mem, cpu);
             cpu->X = Value;
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->X);
         } break;
 
         case INS_LDY_IM: {
             Byte Value = fetchByte(cycles, mem, cpu);
             cpu->Y = Value;
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->Y);
         } break;
     
         case INS_LDA_ZP: {
             Byte ZPAddress = fetchByte(cycles, mem, cpu);
             cpu->A = readByte(cycles, mem, cpu, ZPAddress);
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->A);
         } break;
         
         case INS_LDX_ZP: {
             Byte ZPAddress = fetchByte(cycles, mem, cpu);
             cpu->X = readByte(cycles, mem, cpu, ZPAddress);
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->X);
         } break;
 
         case INS_LDY_ZP: {
             Byte ZPAddress = fetchByte(cycles, mem, cpu);
             cpu->Y = readByte(cycles, mem, cpu, ZPAddress);
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->Y);
         } break;
 
         case INS_LDA_ZX: {
@@ -81,7 +81,7 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             ZPAddress += cpu->X;
             (*cycles)--; // offset for the addition operation
             cpu->A = readByte(cycles, mem, cpu, ZPAddress);
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->A);
         } break;
 
         case INS_LDY_ZX: {
@@ -89,7 +89,7 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             ZPAddress += cpu->X;
             (*cycles)--;
             cpu->Y = readByte(cycles, mem, cpu, ZPAddress);
-            setLoadFlags(cpu);
+            setLoadFlags(cpu, &cpu->Y);
         } break;
 
         default: printf("[ERROR]: Instruction Not Handled: %d\n", Instruction); break;

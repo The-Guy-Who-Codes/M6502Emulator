@@ -56,3 +56,20 @@ void T_LDX_IM(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	NEW_TEST();
 
 }
+
+void T_LDY_IM(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0b11011001;
+	int Z = 0;
+	int N = 1;
+	reset(cpu, mem);
+	mem->Data[0xFFFC] = INS_LDY_IM;
+	mem->Data[0xFFFD] = testValue;
+
+	int cycles = 2;
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->Y, testValue, "LDY_IM_Y", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDY_IM");
+	NEW_TEST();
+
+}

@@ -23,6 +23,7 @@ int main() {
 #endif
     T_LDA_IM(&cpu, &mem, hConsole);
     T_LDX_IM(&cpu, &mem, hConsole);
+    T_LDY_IM(&cpu, &mem, hConsole);
 
     return 0;
 }
