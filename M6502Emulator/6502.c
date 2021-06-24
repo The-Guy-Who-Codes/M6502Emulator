@@ -24,6 +24,11 @@ int main() {
     T_LDA_IM(&cpu, &mem, hConsole);
     T_LDX_IM(&cpu, &mem, hConsole);
     T_LDY_IM(&cpu, &mem, hConsole);
+    T_LDA_ZP(&cpu, &mem, hConsole);
+    T_LDX_ZP(&cpu, &mem, hConsole);
+    T_LDY_ZP(&cpu, &mem, hConsole);
+    T_LDA_ZX(&cpu, &mem, hConsole);
+
 
     return 0;
 }

@@ -28,9 +28,8 @@ static inline Byte readByte(uint32_t* cycles, struct Mem* mem, struct CPU* cpu, 
 }
 
 static inline void setLoadFlags(CPU* cpu, Byte* regValue) {
-    cpu->Z = (regValue == 0); // set if A == 0
-    cpu->N = (((*regValue) & (1 << 7)) >> 7);
-    //cpu->N = (cpu->A & 0b10000000) > 0; // set if Bit 7 of A is set
+    cpu->Z = (*regValue) == 0 ? 1 : 0; // set if A == 0 
+    cpu->N = (((*regValue) & (1 << 7)) >> 7); // set if Bit 7 of A is set
 }
 
 void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {

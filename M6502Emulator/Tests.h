@@ -73,3 +73,95 @@ void T_LDY_IM(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	NEW_TEST();
 
 }
+
+void T_LDA_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0b11011001;
+	int Z = 0;
+	int N = 1;
+	reset(cpu, mem);
+	mem->Data[0xFFFC] = INS_LDA_ZP;
+	mem->Data[0xFFFD] = 0x72;
+	mem->Data[0x72] = testValue;
+
+	int cycles = 3;
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, testValue, "LDA_ZP_A", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDA_ZP");
+	NEW_TEST();
+
+}
+
+void T_LDX_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0b11011001;
+	int Z = 0;
+	int N = 1;
+	reset(cpu, mem);
+	mem->Data[0xFFFC] = INS_LDX_ZP;
+	mem->Data[0xFFFD] = 0x72;
+	mem->Data[0x72] = testValue;
+
+	int cycles = 3;
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->X, testValue, "LDX_ZP_X", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDX_ZP");
+	NEW_TEST();
+
+}
+
+void T_LDY_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0;
+	int Z = 1;
+	int N = 0;
+	reset(cpu, mem);
+	mem->Data[0xFFFC] = INS_LDY_ZP;
+	mem->Data[0xFFFD] = 0x64;
+	mem->Data[0x64] = testValue;
+
+	int cycles = 3;
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->Y, testValue, "LDY_ZP_Y", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDY_ZP");
+	NEW_TEST();
+
+}
+
+void T_LDA_ZX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0x54;
+	int Z = 0;
+	int N = 0;
+	reset(cpu, mem);
+	cpu->X = 0b10101010; 
+	mem->Data[0xFFFC] = INS_LDA_ZX;
+	mem->Data[0xFFFD] = 0b01010101;
+	mem->Data[0xFF] = testValue;
+
+	int cycles = 4;
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, testValue, "LDA_ZX_A", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDA_ZX");
+	NEW_TEST();
+
+}
+
+void T_LDY_ZX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0b10010011;
+	int Z = 0;
+	int N = 1;
+	reset(cpu, mem);
+	cpu->X = 0xA3;
+	mem->Data[0xFFFC] = INS_LDY_ZX;
+	mem->Data[0xFFFD] = 0x12;
+	mem->Data[0xB5] = testValue;
+
+	int cycles = 4;
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->Y, testValue, "LDY_ZX_Y", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDY_ZX");
+	NEW_TEST();
+
+}
