@@ -12,14 +12,21 @@
 // Loading
 #define INS_LDA_IM 0xA9 // immediate
 #define INS_LDA_ZP 0xA5 // Zero Page
-#define INS_LDA_ZX 0xB5 // Zero Page X
+#define INS_LDA_ZPX 0xB5 // Zero Page X
+#define INS_LDA_ABS 0xAD // Absolute mode
+#define INS_LDA_ABSX 0xBD // Absolute X
+#define INS_LDA_ABSY 0xB9 // Absolute Y
 
 #define INS_LDX_IM 0xA2
 #define INS_LDX_ZP 0xA6
+#define INS_LDX_ABS 0xAE
+#define INS_LDX_ABSY 0xBE
 
 #define INS_LDY_IM 0xA0
 #define INS_LDY_ZP 0xA4
-#define INS_LDY_ZX 0xB4
+#define INS_LDY_ZPX 0xB4
+#define INS_LDY_ABS 0xAC
+#define INS_LDY_ABSX 0xBC
 
 
 
@@ -53,7 +60,7 @@ typedef struct CPU {
 } CPU;
 
 
-static const uint8_t OPCODES_CYCLES[256] = {
+static const uint8_t OPCODE_CYCLES[256] = {
     //  0  1   2   3   4   5   6   7   8  9   A   B   C   D   E  F
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 0
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 1
@@ -64,12 +71,12 @@ static const uint8_t OPCODES_CYCLES[256] = {
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  3,  0,  0,  0,  0, 0,  // 6
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 7
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 8
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 9
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  4,  0,  0,  0, 0,  // 9
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // A
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // B
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // C
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // D
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // E
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  4,  4,  0,  0,  0, 0,  // C
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  4,  4,  0,  0,  0, 0,  // D
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  4,  4,  0,  0,  0, 0,  // E
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // F
 
 };

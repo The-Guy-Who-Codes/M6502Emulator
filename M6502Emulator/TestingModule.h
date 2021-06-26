@@ -42,7 +42,7 @@ void TEST_EQ(int val1, int val2, char* testName, HANDLE* hConsole) {
     }
     else {
         TextRed;
-        printf("[%s]: Fail\nValue 1: %x\nValue 2: %x\n(In Hex)\n\n", testName, val1, val2);
+        printf("[%s]: Fail\nRecieved: %x\nExpected: %x\n(In Hex)\n\n", testName, val1, val2);
         TextWhite;
     }
 }

@@ -27,8 +27,15 @@ int main() {
     T_LDA_ZP(&cpu, &mem, hConsole);
     T_LDX_ZP(&cpu, &mem, hConsole);
     T_LDY_ZP(&cpu, &mem, hConsole);
-    T_LDA_ZX(&cpu, &mem, hConsole);
-
+    T_LDA_ZPX(&cpu, &mem, hConsole);
+    T_LDY_ZPX(&cpu, &mem, hConsole);
+    T_LDA_ABS(&cpu, &mem, hConsole);
+    T_LDX_ABS(&cpu, &mem, hConsole);
+    T_LDY_ABS(&cpu, &mem, hConsole);
+    T_LDA_ABSX(&cpu, &mem, hConsole);
+    T_LDY_ABSX(&cpu, &mem, hConsole);
+    T_LDA_ABSY(&cpu, &mem, hConsole);
+    T_LDX_ABSY(&cpu, &mem, hConsole);
 
     return 0;
 }
