@@ -2,7 +2,7 @@
 #include <stdint.h>
 #define MaxMem (1024 * 64) // defines the maximum amount of bytes the 6502 can handle in memory
 
-/** opcodes    */
+/** opcodes */
 
 // To Add New Instruction
 // 1. Add opcode in Definition list below
@@ -16,9 +16,12 @@
 #define INS_LDA_ABS 0xAD // Absolute mode
 #define INS_LDA_ABSX 0xBD // Absolute X
 #define INS_LDA_ABSY 0xB9 // Absolute Y
+#define INS_LDA_INDX 0xA1 // Indirect X
+#define INS_LDA_INDY 0xB1 // Indirect Y
 
 #define INS_LDX_IM 0xA2
 #define INS_LDX_ZP 0xA6
+#define INS_LDX_ZPY 0xB6
 #define INS_LDX_ABS 0xAE
 #define INS_LDX_ABSY 0xBE
 
@@ -63,12 +66,12 @@ typedef struct CPU {
 static const uint8_t OPCODE_CYCLES[256] = {
     //  0  1   2   3   4   5   6   7   8  9   A   B   C   D   E  F
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 0
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 1
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  6,  5,  0,  0,  0, 0,  // 1
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 2
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 3
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  3,  4,  0,  0,  0, 0,  // 4
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  3,  4,  0,  0,  0, 0,  // 5
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  3,  0,  0,  0,  0, 0,  // 6
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  3,  4,  0,  0,  0, 0,  // 6
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 7
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 8
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  4,  0,  0,  0, 0,  // 9

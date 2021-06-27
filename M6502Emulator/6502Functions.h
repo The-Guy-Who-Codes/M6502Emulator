@@ -31,8 +31,16 @@ static inline Word fetchWord(uint32_t* cycles, struct Mem* mem, struct CPU* cpu)
     Word Data = mem->Data[cpu->PC];
     cpu->PC++;
     (*cycles)--;
-    Data += mem->Data[cpu->PC] * 16 * 16; // this is due to the 6502 being little endian (i.e. LSB being stored first)
+    Data += mem->Data[cpu->PC] << 8; // this is due to the 6502 being little endian (i.e. LSB being stored first)
     cpu->PC++;
+    (*cycles)--;
+    return Data;
+}
+
+static inline Word readWord(uint32_t* cycles, struct Mem* mem, struct CPU* cpu, Word Address) {
+    Word Data = mem->Data[Address + 1] << 8;
+    (*cycles)--;
+    Data += mem->Data[Address];
     (*cycles)--;
     return Data;
 }
@@ -107,6 +115,14 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             setLoadFlags(cpu, &cpu->Y);
         } break;
 
+        case INS_LDX_ZPY: {
+            Byte ZPAddress = fetchByte(cycles, mem, cpu);
+            ZPAddress += cpu->Y;
+            (*cycles)--;
+            cpu->X = readByte(cycles, mem, cpu, ZPAddress);
+            setLoadFlags(cpu, &cpu->X);
+        } break;
+
         case INS_LDA_ABS: {
             Word Address = fetchWord(cycles, mem, cpu);
             cpu->A = readByte(cycles, mem, cpu, Address);
@@ -171,6 +187,22 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             }
             cpu->X = readByte(cycles, mem, cpu, AbsAddress);
             setLoadFlags(cpu, &cpu->X);
+        } break;
+
+        case INS_LDA_INDX: {
+            Byte baseAddress = fetchByte(cycles, mem, cpu);
+            baseAddress += cpu->X;
+            Word Address = readWord(cycles, mem, cpu, baseAddress);
+            cpu->A = readWord(cycles, mem, cpu, Address);
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_LDA_INDY: {
+            Byte baseAddress = fetchByte(cycles, mem, cpu);
+            Word Address = readWord(cycles, mem, cpu, baseAddress);
+            Address += cpu->Y;
+            cpu->A = readByte(cycles, mem, cpu, Address);
+            setLoadFlags(cpu, &cpu->A);
         } break;
 
         default: {

@@ -173,6 +173,25 @@ void T_LDY_ZPX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 
 }
 
+void T_LDX_ZPY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0b0;
+	int Z = 1;
+	int N = 0;
+	reset(cpu, mem);
+	cpu->Y = 0xA3;
+	mem->Data[0xFFFC] = INS_LDX_ZPY;
+	mem->Data[0xFFFD] = 0x12;
+	mem->Data[0xB5] = testValue;
+
+	int cycles = 4;
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->X, testValue, "LDX_ZPY_X", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDX_ZPY");
+	NEW_TEST();
+
+}
+
 void T_LDA_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	int testValue = 0b01010011;
 	int Z = 0;
@@ -306,6 +325,48 @@ void T_LDX_ABSY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 
 	TEST_EQ(cpu->X, testValue, "LDX_ABSY_X", hConsole);
 	TestLoadFlags(cpu, hConsole, Z, N, "LDX_ABSY");
+	NEW_TEST();
+
+}
+
+void T_LDA_INDX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0b11000101;
+	int Z = 0;
+	int N = 1;
+	reset(cpu, mem);
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_LDA_INDX;
+	mem->Data[0xFFFD] = 0xFD;
+	mem->Data[0x1E] = 0x80;
+	mem->Data[0x1F] = 0x12;
+	mem->Data[0x1280] = testValue;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_LDA_INDX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, testValue, "LDA_INDX_A", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDA_INDX");
+	NEW_TEST();
+
+}
+
+void T_LDA_INDY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int testValue = 0b10000101;
+	int Z = 0;
+	int N = 1;
+	reset(cpu, mem);
+	cpu->Y = 0x21;
+	mem->Data[0xFFFC] = INS_LDA_INDY;
+	mem->Data[0xFFFD] = 0xFD;
+	mem->Data[0xFD] = 0x80;
+	mem->Data[0xFE] = 0x12;
+	mem->Data[0x12A1] = testValue;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_LDA_INDY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, testValue, "LDA_INDY_A", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "LDA_INDY");
 	NEW_TEST();
 
 }
