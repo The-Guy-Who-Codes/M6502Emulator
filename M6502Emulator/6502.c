@@ -40,5 +40,9 @@ int main() {
     T_LDA_INDX(&cpu, &mem, hConsole);
     T_LDA_INDY(&cpu, &mem, hConsole);
 
+    T_STA_ZP(&cpu, &mem, hConsole);
+    T_STX_ZP(&cpu, &mem, hConsole);
+    T_STY_ZP(&cpu, &mem, hConsole);
+
     return 0;
 }

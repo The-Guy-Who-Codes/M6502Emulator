@@ -1,0 +1,3 @@
+[X] impliment loading functions
+[X] put all addressing modes into seperate functions
+[] impliment storing functions

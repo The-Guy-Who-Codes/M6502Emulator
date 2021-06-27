@@ -56,12 +56,58 @@ static inline void setLoadFlags(CPU* cpu, Byte* regValue) {
     cpu->N = (((*regValue) & (1 << 7)) >> 7); // set if Bit 7 of A is set
 }
 
+static inline Byte ZPX(uint32_t* cycles, Mem* mem, CPU* cpu) {
+    Byte ZPAddress = fetchByte(cycles, mem, cpu);
+    ZPAddress += cpu->X;
+    (*cycles)--;
+    return ZPAddress;
+}
+
+static inline Word ABSX(uint32_t* cycles, Mem* mem, CPU* cpu) {
+    Word Address = fetchWord(cycles, mem, cpu);
+    Word AbsAddress = Address + cpu->X;
+    // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
+    pageCrossedAddCycle(cycles, Address, AbsAddress);
+    if ((Address >> 8) != (AbsAddress >> 8)) {
+        (*cycles)--; // to offset for the fact the 6502 adder is only 8-bit
+    }
+    return AbsAddress;
+}
+
+static inline Word ABSY(uint32_t* cycles, Mem* mem, CPU* cpu) {
+    Word Address = fetchWord(cycles, mem, cpu);
+    Word AbsAddress = Address + cpu->Y;
+    // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
+    pageCrossedAddCycle(cycles, Address, AbsAddress);
+    if ((Address >> 8) != (AbsAddress >> 8)) {
+        (*cycles)--; // to offset for the fact the 6502 proessor is only 8-bit
+    }
+    return AbsAddress;
+}
+
+static inline Word INDX(uint32_t* cycles, Mem* mem, CPU* cpu) {
+    Byte baseAddress = fetchByte(cycles, mem, cpu);
+    baseAddress += cpu->X;
+    Word Address = readWord(cycles, mem, cpu, baseAddress);
+    return Address;
+}
+
+static inline Word INDY(uint32_t* cycles, Mem* mem, CPU* cpu) {
+    Byte baseAddress = fetchByte(cycles, mem, cpu);
+    Word Address = readWord(cycles, mem, cpu, baseAddress);
+    Address += cpu->Y;
+    return Address;
+}
+
+
 void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
     while (*cycles > 0) {
         Byte Instruction = fetchByte(cycles, mem, cpu);
         switch (Instruction) {
 
             // data from [http://www.obelisk.me.uk/6502/instructions.html]
+
+        /* Loading */
 
         case INS_LDA_IM: {
             Byte Value = fetchByte(cycles, mem, cpu);
@@ -100,25 +146,19 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
         } break;
 
         case INS_LDA_ZPX: {
-            Byte ZPAddress = fetchByte(cycles, mem, cpu);
-            ZPAddress += cpu->X;
-            (*cycles)--; // offset for the addition operation
+            Byte ZPAddress = ZPX(cycles, mem, cpu);
             cpu->A = readByte(cycles, mem, cpu, ZPAddress);
             setLoadFlags(cpu, &cpu->A);
         } break;
 
         case INS_LDY_ZPX: {
-            Byte ZPAddress = fetchByte(cycles, mem, cpu);
-            ZPAddress += cpu->X;
-            (*cycles)--;
+            Byte ZPAddress = ZPX(cycles, mem, cpu);
             cpu->Y = readByte(cycles, mem, cpu, ZPAddress);
             setLoadFlags(cpu, &cpu->Y);
         } break;
 
         case INS_LDX_ZPY: {
-            Byte ZPAddress = fetchByte(cycles, mem, cpu);
-            ZPAddress += cpu->Y;
-            (*cycles)--;
+            Byte ZPAddress = ZPX(cycles, mem, cpu);
             cpu->X = readByte(cycles, mem, cpu, ZPAddress);
             setLoadFlags(cpu, &cpu->X);
         } break;
@@ -142,67 +182,59 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
         } break;
 
         case INS_LDA_ABSX: {
-            Word Address = fetchWord(cycles, mem, cpu);
-            Word AbsAddress = Address + cpu->X;
-            // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
-            pageCrossedAddCycle(cycles, Address, AbsAddress);
-            if ((Address >> 8) != (AbsAddress >> 8)) { 
-                (*cycles)--; // to offset for the fact the 6502 proessor is only 8-bit
-            }
+            Word AbsAddress = ABSX(cycles, mem, cpu);
             cpu->A = readByte(cycles, mem, cpu, AbsAddress);
             setLoadFlags(cpu, &cpu->A);
         } break;
 
         case INS_LDY_ABSX: {
-            Word Address = fetchWord(cycles, mem, cpu);
-            Word AbsAddress = Address + cpu->X;
-            // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
-            pageCrossedAddCycle(cycles, Address, AbsAddress);
-            if ((Address >> 8) != (AbsAddress >> 8)) {
-                (*cycles)--; // to offset for the fact the 6502 proessor is only 8-bit
-            }
+            Word AbsAddress = ABSX(cycles, mem, cpu);
             cpu->Y = readByte(cycles, mem, cpu, AbsAddress);
             setLoadFlags(cpu, &cpu->Y);
         } break;
 
         case INS_LDA_ABSY: {
-            Word Address = fetchWord(cycles, mem, cpu);
-            Word AbsAddress = Address + cpu->Y;
-            // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
-            pageCrossedAddCycle(cycles, Address, AbsAddress);
-            if ((Address >> 8) != (AbsAddress >> 8)) {
-                (*cycles)--; // to offset for the fact the 6502 proessor is only 8-bit
-            }
+            Word AbsAddress = ABSY(cycles, mem, cpu);
             cpu->A = readByte(cycles, mem, cpu, AbsAddress);
             setLoadFlags(cpu, &cpu->A);
         } break;
 
         case INS_LDX_ABSY: {
-            Word Address = fetchWord(cycles, mem, cpu);
-            Word AbsAddress = Address + cpu->Y;
-            // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
-            pageCrossedAddCycle(cycles, Address, AbsAddress);
-            if ((Address >> 8) != (AbsAddress >> 8)) {
-                (*cycles)--; // to offset for the fact the 6502 proessor is only 8-bit
-            }
+            Word AbsAddress = ABSY(cycles, mem, cpu);
             cpu->X = readByte(cycles, mem, cpu, AbsAddress);
             setLoadFlags(cpu, &cpu->X);
         } break;
 
         case INS_LDA_INDX: {
-            Byte baseAddress = fetchByte(cycles, mem, cpu);
-            baseAddress += cpu->X;
-            Word Address = readWord(cycles, mem, cpu, baseAddress);
+            Word Address = INDX(cycles, mem, cpu);
             cpu->A = readWord(cycles, mem, cpu, Address);
             setLoadFlags(cpu, &cpu->A);
         } break;
 
         case INS_LDA_INDY: {
-            Byte baseAddress = fetchByte(cycles, mem, cpu);
-            Word Address = readWord(cycles, mem, cpu, baseAddress);
-            Address += cpu->Y;
+            Word Address = INDY(cycles, mem, cpu);
             cpu->A = readByte(cycles, mem, cpu, Address);
             setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        /* Storing */
+
+        case INS_STA_ZP: {
+            Byte Address = fetchByte(cycles, mem, cpu);
+            mem->Data[Address] = cpu->A;
+            (*cycles)--;
+        } break;
+
+        case INS_STX_ZP: {
+            Byte Address = fetchByte(cycles, mem, cpu);
+            mem->Data[Address] = cpu->X;
+            (*cycles)--;
+        } break;
+
+        case INS_STY_ZP: {
+            Byte Address = fetchByte(cycles, mem, cpu);
+            mem->Data[Address] = cpu->Y;
+            (*cycles)--;
         } break;
 
         default: {

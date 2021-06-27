@@ -37,5 +37,8 @@
     <Text Include="potentialBugs.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="ToDo.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

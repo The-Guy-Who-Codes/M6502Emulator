@@ -1,1 +1,2 @@
 In Idirect, X mode: if LSB of effective address is stored in 0xFF then the readWord function may not wrap around to 0x00 to read the MSB
+Page crossing cycle increase is not implimented in INS_LDA_INDY, but should be fine

@@ -21,6 +21,8 @@ void TestLoadFlags(struct CPU* cpu, HANDLE* hConsole, int Z, int N, char* prefix
 	TEST_EQ(cpu->Z, Z, nameZ, hConsole);
 }
 
+/* Loading Tests */
+
 // example test
 
 void T_LDA_IM(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
@@ -369,4 +371,48 @@ void T_LDA_INDY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	TestLoadFlags(cpu, hConsole, Z, N, "LDA_INDY");
 	NEW_TEST();
 
+}
+
+/* Storing Tests */
+
+void T_STA_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int storeLocation = 0x32;
+	reset(cpu, mem);
+	cpu->A = 0x72;
+	mem->Data[0xFFFC] = INS_STA_ZP;
+	mem->Data[0xFFFD] = storeLocation;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STA_ZP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation], cpu->A, "STA_ZP", hConsole);
+	NEW_TEST();
+}
+
+void T_STX_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int storeLocation = 0x23;
+	reset(cpu, mem);
+	cpu->X = 0x98;
+	mem->Data[0xFFFC] = INS_STX_ZP;
+	mem->Data[0xFFFD] = storeLocation;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STX_ZP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation], cpu->X, "STX_ZP", hConsole);
+	NEW_TEST();
+}
+
+void T_STY_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int storeLocation = 0x32;
+	reset(cpu, mem);
+	cpu->Y = 0x72;
+	mem->Data[0xFFFC] = INS_STY_ZP;
+	mem->Data[0xFFFD] = storeLocation;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STY_ZP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation], cpu->Y, "STY_ZP", hConsole);
+	NEW_TEST();
 }
