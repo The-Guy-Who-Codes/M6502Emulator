@@ -35,7 +35,6 @@
 #define INS_STA_ZP 0x85
 #define INS_STA_ABS 0x8D
 #define INS_STA_ZPX 0x95
-
 #define INS_STA_ABSX 0x9D
 #define INS_STA_ABSY 0x99
 
