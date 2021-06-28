@@ -63,14 +63,21 @@ static inline Byte ZPX(uint32_t* cycles, Mem* mem, CPU* cpu) {
     return ZPAddress;
 }
 
+static inline Byte ZPY(uint32_t* cycles, Mem* mem, CPU* cpu) {
+    Byte ZPAddress = fetchByte(cycles, mem, cpu);
+    ZPAddress += cpu->Y;
+    (*cycles)--;
+    return ZPAddress;
+}
+
 static inline Word ABSX(uint32_t* cycles, Mem* mem, CPU* cpu) {
     Word Address = fetchWord(cycles, mem, cpu);
     Word AbsAddress = Address + cpu->X;
     // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
-    pageCrossedAddCycle(cycles, Address, AbsAddress);
+    /*pageCrossedAddCycle(cycles, Address, AbsAddress);
     if ((Address >> 8) != (AbsAddress >> 8)) {
         (*cycles)--; // to offset for the fact the 6502 adder is only 8-bit
-    }
+    }*/
     return AbsAddress;
 }
 
@@ -78,10 +85,10 @@ static inline Word ABSY(uint32_t* cycles, Mem* mem, CPU* cpu) {
     Word Address = fetchWord(cycles, mem, cpu);
     Word AbsAddress = Address + cpu->Y;
     // refer to [http://archive.6502.org/datasheets/synertek_hardware_manual.pdf] (pg. 168) as to why there is not cycle decrease after addition
-    pageCrossedAddCycle(cycles, Address, AbsAddress);
+    /*pageCrossedAddCycle(cycles, Address, AbsAddress);
     if ((Address >> 8) != (AbsAddress >> 8)) {
         (*cycles)--; // to offset for the fact the 6502 proessor is only 8-bit
-    }
+    }*/
     return AbsAddress;
 }
 
@@ -234,6 +241,56 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
         case INS_STY_ZP: {
             Byte Address = fetchByte(cycles, mem, cpu);
             mem->Data[Address] = cpu->Y;
+            (*cycles)--;
+        } break;
+
+        case INS_STA_ABS: {
+            Word Address = fetchWord(cycles, mem, cpu);
+            mem->Data[Address] = cpu->A;
+            (*cycles)--;
+        } break;
+
+        case INS_STX_ABS: {
+            Word Address = fetchWord(cycles, mem, cpu);
+            mem->Data[Address] = cpu->X;
+            (*cycles)--;
+        } break;
+
+        case INS_STY_ABS: {
+            Word Address = fetchWord(cycles, mem, cpu);
+            mem->Data[Address] = cpu->Y;
+            (*cycles)--;
+        } break;
+
+        case INS_STA_ZPX: {
+            Byte Address = ZPX(cycles, mem, cpu);
+            mem->Data[Address] = cpu->A;
+            (*cycles)--;
+        } break;
+
+        case INS_STY_ZPX: {
+            Byte Address = ZPX(cycles, mem, cpu);
+            mem->Data[Address] = cpu->Y;
+            (*cycles)--;
+        } break;
+
+        case INS_STX_ZPY: {
+            Byte Address = ZPY(cycles, mem, cpu);
+            mem->Data[Address] = cpu->X;
+            (*cycles)--;
+        } break;
+
+        case INS_STA_ABSX: {
+            Word Address = ABSX(cycles, mem, cpu);
+            (*cycles)--;
+            mem->Data[Address] = cpu->A;
+            (*cycles)--;
+        } break;
+
+        case INS_STA_ABSY: {
+            Word Address = ABSY(cycles, mem, cpu);
+            (*cycles)--;
+            mem->Data[Address] = cpu->A;
             (*cycles)--;
         } break;
 

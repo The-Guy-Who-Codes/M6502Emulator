@@ -416,3 +416,125 @@ void T_STY_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	TEST_EQ(mem->Data[storeLocation], cpu->Y, "STY_ZP", hConsole);
 	NEW_TEST();
 }
+
+void T_STA_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	uint16_t storeLocation = 0x3264;
+	reset(cpu, mem);
+	cpu->A = 0x72;
+	mem->Data[0xFFFC] = INS_STA_ABS;
+	mem->Data[0xFFFD] = (storeLocation << 8) >> 8;
+	mem->Data[0xFFFE] = storeLocation >> 8;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STA_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation], cpu->A, "STA_ABS", hConsole);
+	NEW_TEST();
+}
+
+void T_STX_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	uint16_t storeLocation = 0xA234;
+	reset(cpu, mem);
+	cpu->X = 0xFF;
+	mem->Data[0xFFFC] = INS_STX_ABS;
+	mem->Data[0xFFFD] = (storeLocation << 8) >> 8;
+	mem->Data[0xFFFE] = storeLocation >> 8;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STX_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation], cpu->X, "STX_ABS", hConsole);
+	NEW_TEST();
+}
+
+void T_STY_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	uint16_t storeLocation = 0xFF65;
+	reset(cpu, mem);
+	cpu->Y = 0xCD;
+	mem->Data[0xFFFC] = INS_STY_ABS;
+	mem->Data[0xFFFD] = (storeLocation << 8) >> 8;
+	mem->Data[0xFFFE] = storeLocation >> 8;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STY_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation], cpu->Y, "STY_ABS", hConsole);
+	NEW_TEST();
+}
+
+void T_STA_ZPX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	Byte storeLocation = 0x42;
+	reset(cpu, mem);
+	cpu->A = 0xCD;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_STA_ZPX;
+	mem->Data[0xFFFD] = storeLocation;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STA_ZPX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation + cpu->X], cpu->A, "STA_ZPX", hConsole);
+	NEW_TEST();
+}
+
+void T_STY_ZPX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	Byte storeLocation = 0x42;
+	reset(cpu, mem);
+	cpu->Y = 0xCD;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_STY_ZPX;
+	mem->Data[0xFFFD] = storeLocation;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STY_ZPX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation + cpu->X], cpu->Y, "STY_ZPX", hConsole);
+	NEW_TEST();
+}
+
+void T_STX_ZPY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	Byte storeLocation = 0x42;
+	reset(cpu, mem);
+	cpu->X = 0xCD;
+	cpu->Y = 0x21;
+	mem->Data[0xFFFC] = INS_STX_ZPY;
+	mem->Data[0xFFFD] = storeLocation;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STX_ZPY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation + cpu->Y], cpu->X, "STX_ZPY", hConsole);
+	NEW_TEST();
+}
+
+void T_STA_ABSX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	uint16_t storeLocation = 0x3264;
+	reset(cpu, mem);
+	cpu->A = 0x72;
+	cpu->X = 0xA3;
+	mem->Data[0xFFFC] = INS_STA_ABSX;
+	mem->Data[0xFFFD] = (storeLocation << 8) >> 8;
+	mem->Data[0xFFFE] = storeLocation >> 8;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STA_ABSX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation + cpu->X], cpu->A, "STA_ABSX", hConsole);
+	NEW_TEST();
+}
+
+void T_STA_ABSY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	uint16_t storeLocation = 0xF2A4;
+	reset(cpu, mem);
+	cpu->A = 0x42;
+	cpu->Y = 0xA3;
+	mem->Data[0xFFFC] = INS_STA_ABSY;
+	mem->Data[0xFFFD] = (storeLocation << 8) >> 8;
+	mem->Data[0xFFFE] = storeLocation >> 8;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STA_ABSY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation + cpu->Y], cpu->A, "STA_ABSY", hConsole);
+	NEW_TEST();
+}

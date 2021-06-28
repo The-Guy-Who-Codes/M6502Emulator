@@ -43,6 +43,14 @@ int main() {
     T_STA_ZP(&cpu, &mem, hConsole);
     T_STX_ZP(&cpu, &mem, hConsole);
     T_STY_ZP(&cpu, &mem, hConsole);
+    T_STA_ABS(&cpu, &mem, hConsole);
+    T_STX_ABS(&cpu, &mem, hConsole);
+    T_STY_ABS(&cpu, &mem, hConsole);
+    T_STA_ZPX(&cpu, &mem, hConsole);
+    T_STY_ZPX(&cpu, &mem, hConsole);
+    T_STX_ZPY(&cpu, &mem, hConsole);
+    T_STA_ABSX(&cpu, &mem, hConsole);
+    T_STA_ABSY(&cpu, &mem, hConsole);
 
     return 0;
 }
