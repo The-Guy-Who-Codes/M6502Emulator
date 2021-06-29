@@ -1,2 +1,3 @@
 In Idirect, X mode: if LSB of effective address is stored in 0xFF then the readWord function may not wrap around to 0x00 to read the MSB
 Page crossing cycle increase is not implimented in for loading functions, but should be fine
+PC may not be incrimenting right amount after each instrucion

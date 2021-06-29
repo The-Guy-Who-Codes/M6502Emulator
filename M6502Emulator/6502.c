@@ -66,6 +66,13 @@ int main() {
     T_TXS_IMP(&cpu, &mem, hConsole);
 
     T_PHA_IMP(&cpu, &mem, hConsole);
+    T_PHP_IMP(&cpu, &mem, hConsole);
+    T_PLA_IMP(&cpu, &mem, hConsole);
+    T_PLP_IMP(&cpu, &mem, hConsole);
+
+    T_AND_IM(&cpu, &mem, hConsole);
+    T_AND_ZP(&cpu, &mem, hConsole);
+    T_AND_ZPX(&cpu, &mem, hConsole);
 
 
     return 0;

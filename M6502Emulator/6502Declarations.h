@@ -60,6 +60,14 @@
 
 #define INS_PHA_IMP 0x48 // push A to stack
 #define INS_PHP_IMP 0x08 // push processor status flags to the stack
+#define INS_PLA_IMP 0x68 // pull accmulator from stack
+#define INS_PLP_IMP 0x28 // pull status flags from stack
+
+// Logical Operations
+#define INS_AND_IM 0x29 // Logical AND with immediate addressing
+#define INS_AND_ZP 0x25
+#define INS_AND_ZPX 0x35
+
 
 
 
@@ -76,13 +84,14 @@ struct StatusFlags {
 
 
     // status flags using bit fields
-    Byte C : 1; // carry
+    Byte C : 1; // carry (least significant bit)
     Byte Z : 1; // Zero
     Byte I : 1; // interrupt Disable
     Byte D : 1; // Decimal mode
     Byte B : 1; // Break command
     Byte O : 1; // Overflow
     Byte N : 1; // negative
+    Byte Ign : 1; // ignore (this is the most sinificant bit)
 
 };
 
@@ -98,6 +107,7 @@ typedef struct CPU {
 
         Byte PS; // Processor status
         struct StatusFlags Flag;
+
     };
     
 
@@ -114,13 +124,13 @@ static const uint8_t OPCODE_CYCLES[256] = {
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 2
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 3
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 4
-        0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 5
+        0, 0,  3,  4,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 5
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 6
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 7
-        0, 0,  0,  0,  3,  0,  0,  0,  0, 2,  2,  0,  0,  0,  0, 0,  // 8
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 5,  2,  4,  0,  0,  0, 0,  // 9
+        3, 0,  4,  0,  3,  0,  4,  0,  0, 2,  2,  0,  0,  0,  0, 0,  // 8
+        0, 0,  2,  0,  0,  0,  0,  0,  0, 5,  2,  4,  0,  0,  0, 0,  // 9
         0, 0,  0,  0,  0,  0,  0,  0,  2, 2,  2,  2,  0,  0,  0, 0,  // A
-        3, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // B
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // B
         0, 0,  0,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // C
         0, 0,  0,  0,  0,  0,  0,  0,  4, 5,  4,  4,  0,  0,  0, 0,  // D
         0, 0,  0,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // E

@@ -3,7 +3,7 @@
 [X] impliment storing functions
 [X] impliment register transfers
 [] impliment logical operations
-[] impliment stack operations
+[X] impliment stack operations
 [] impliment arithmetic operations
 [] impliments binary shifts
 [] impliment jumps and calls

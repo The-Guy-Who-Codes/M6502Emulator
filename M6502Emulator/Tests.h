@@ -693,3 +693,143 @@ void T_PHA_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	NEW_TEST();
 
 }
+
+void T_PHP_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->Flag.C = 1;
+	cpu->Flag.Z = 1;
+	cpu->Flag.I = 1;
+	cpu->Flag.D = 1;
+	cpu->Flag.B = 1;
+	cpu->Flag.O = 0;
+	cpu->Flag.N = 1;
+
+	mem->Data[0xFFFC] = INS_PHP_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_PHP_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[0x01FF], cpu->PS, "PHP_IMP", hConsole);
+	NEW_TEST();
+
+}
+
+void T_PLA_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	mem->Data[0xFFFC] = INS_PLA_IMP;
+	mem->Data[0x01FF] = 0b10010011;
+	int Z = 0;
+	int N = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_PLA_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, mem->Data[0x01FF], "PLA_IMP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "PLA_IMP");
+	NEW_TEST();
+
+}
+
+void T_PLP_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+#if 0
+	cpu->Flag.C = 1;
+	cpu->Flag.Z = 1;
+	cpu->Flag.I = 1;
+	cpu->Flag.D = 1;
+	cpu->Flag.B = 1;
+	cpu->Flag.O = 0;
+	cpu->Flag.N = 1;
+#endif
+	cpu->PS = 0;
+	mem->Data[0xFFFC] = INS_PLP_IMP;
+	mem->Data[0x01FF] = 0b10101110;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_PLP_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->Flag.N, 0, "PLP_IMP_N", hConsole);
+	TEST_EQ(cpu->Flag.O, 1, "PLP_IMP_O", hConsole);
+	TEST_EQ(cpu->Flag.B, 0, "PLP_IMP_B", hConsole);
+	TEST_EQ(cpu->Flag.D, 1, "PLP_IMP_D", hConsole);
+	TEST_EQ(cpu->Flag.I, 1, "PLP_IMP_I", hConsole);
+	TEST_EQ(cpu->Flag.Z, 1, "PLP_IMP_Z", hConsole);
+	TEST_EQ(cpu->Flag.C, 0, "PLP_IMP_C", hConsole);
+
+	NEW_TEST();
+
+}
+
+/* Logical Operations Tests */
+
+void T_AND_IM(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b10010011;
+	Byte value2 = 0b10010110;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_AND_IM;
+	mem->Data[0xFFFD] = value2;
+	
+	// flags for after the operation
+	int Z = 0;
+	int N = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_IM)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_IM", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_IM");
+	NEW_TEST();
+
+}
+
+void T_AND_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b10101010;
+	Byte value2 = 0b01010101;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_AND_ZP;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = value2;
+
+	// flags for after the operation
+	int Z = 1;
+	int N = 0;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_ZP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_ZP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_ZP");
+	NEW_TEST();
+
+}
+
+void T_AND_ZPX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b01011101;
+	cpu->A = value1;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_AND_ZPX;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x53] = value2;
+
+	// flags for after the operation
+	int Z = 0;
+	int N = 0;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_ZPX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_ZPX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_ZPX");
+	NEW_TEST();
+
+}

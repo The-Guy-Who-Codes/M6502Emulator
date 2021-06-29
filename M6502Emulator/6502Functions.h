@@ -10,7 +10,7 @@ static inline void reset(struct CPU* cpu, struct Mem* mem) { // resets the state
     cpu->PC = 0xFFFC; // the reset vector in memory for the 6502 [https://www.c64-wiki.com/wiki/Reset_(Process)] 
     cpu->SP = 0xFF;
     cpu->Flag.D = 0; // clear decimal flag
-    cpu->Flag.C = cpu->Flag.Z = cpu->Flag.I = cpu->Flag.B = cpu->Flag.O = cpu->Flag.N = 0; // clear all flag registers
+    cpu->Flag.C = cpu->Flag.Z = cpu->Flag.I = cpu->Flag.B = cpu->Flag.O = cpu->Flag.N = cpu->Flag.Ign = 0; // clear all flag registers
     memInit(mem);
 }
 
@@ -24,6 +24,7 @@ static inline Byte fetchByte(uint32_t* cycles, struct Mem* mem, struct CPU* cpu)
 static inline Byte readByte(uint32_t* cycles, struct Mem* mem, struct CPU* cpu, Word Address){
     Byte Data = mem->Data[Address]; // fetches byte which PC is pointing to
     (*cycles)--; // decriments cycle counter as fetching takes 1 cycle
+    cpu->PC++;
     return Data;
 }
 
@@ -42,6 +43,7 @@ static inline Word readWord(uint32_t* cycles, struct Mem* mem, struct CPU* cpu, 
     (*cycles)--;
     Data += mem->Data[Address];
     (*cycles)--;
+    cpu->PC += 2;
     return Data;
 }
 
@@ -114,6 +116,13 @@ static inline void stackPush(Byte value, uint32_t* cycles, struct CPU* cpu, stru
     mem->Data[SPAddress(cpu->SP)] = value;
     (*cycles)--;
     cpu->SP--;
+}
+
+static inline void stackPull(Byte* reg, uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
+    *reg = mem->Data[SPAddress(cpu->SP)];
+    (*cycles)--;
+    cpu->SP++;
+    (*cycles)--;
 }
 
 
@@ -363,7 +372,39 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
         } break;
 
         case INS_PHP_IMP: {
-            continue;
+            stackPush(cpu->PS, cycles, cpu, mem);
+            (*cycles)--;
+        } break;
+
+        case INS_PLA_IMP: {
+            stackPull(&cpu->A, cycles, cpu, mem);
+            setLoadFlags(cpu, &cpu->A);
+            (*cycles)--;
+        } break;
+
+        case INS_PLP_IMP: {
+            stackPull(&cpu->PS, cycles, cpu, mem);
+            (*cycles)--;
+        } break;
+
+        /* Logical Operations */
+
+        case INS_AND_IM: {
+            cpu->A = cpu->A & fetchByte(cycles, mem, cpu);
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_AND_ZP: {
+            cpu->A = cpu->A & mem->Data[fetchByte(cycles, mem, cpu)];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_AND_ZPX: {
+            Byte Address = ZPX(cycles, mem, cpu);
+            cpu->A = cpu->A & mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
         } break;
 
         default: {
