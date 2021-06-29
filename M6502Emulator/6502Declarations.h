@@ -37,6 +37,8 @@
 #define INS_STA_ZPX 0x95
 #define INS_STA_ABSX 0x9D
 #define INS_STA_ABSY 0x99
+#define INS_STA_INDX 0x81
+#define INS_STA_INDY 0x91
 
 #define INS_STX_ZP 0x86
 #define INS_STX_ABS 0x8E
@@ -45,6 +47,15 @@
 #define INS_STY_ZP 0x84
 #define INS_STY_ABS 0x8C
 #define INS_STY_ZPX 0x94
+
+// Register Transfers
+#define INS_TAX_IMP 0xAA // copy Accumulator to the X register
+#define INS_TAY_IMP 0xA8 // A --> X
+#define INS_TXA_IMP 0x8A // X --> A
+#define INS_TYA_IMP 0x98 // Y --> A
+
+// Stack Operations
+#define INS_TSX_IMP 0xBA // copies contents of stack register into X register
 
 
 
@@ -60,7 +71,7 @@ typedef struct CPU {
     // info about registers [http://www.obelisk.me.uk/6502/registers.html]
 
     Word PC; // program counter
-    Word SP; // stack pointer
+    Byte SP; // stack pointer
 
     Byte A, X, Y; // registers
 
@@ -80,16 +91,16 @@ typedef struct CPU {
 static const uint8_t OPCODE_CYCLES[256] = {
     //  0  1   2   3   4   5   6   7   8  9   A   B   C   D   E  F
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 0
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  6,  5,  0,  0,  0, 0,  // 1
+        0, 0,  0,  0,  0,  0,  0,  0,  6, 6,  6,  5,  0,  0,  0, 0,  // 1
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 2
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 3
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 4
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 5
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 6
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 7
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 8
+        0, 0,  0,  0,  0,  0,  0,  0,  0, 2,  2,  0,  0,  0,  0, 0,  // 8
         0, 0,  0,  0,  0,  0,  0,  0,  0, 5,  2,  4,  0,  0,  0, 0,  // 9
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // A
+        0, 0,  0,  0,  0,  0,  0,  0,  2, 0,  2,  2,  0,  0,  0, 0,  // A
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // B
         0, 0,  0,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // C
         0, 0,  0,  0,  0,  0,  0,  0,  4, 5,  4,  4,  0,  0,  0, 0,  // D

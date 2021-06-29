@@ -538,3 +538,39 @@ void T_STA_ABSY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	TEST_EQ(mem->Data[storeLocation + cpu->Y], cpu->A, "STA_ABSY", hConsole);
 	NEW_TEST();
 }
+
+void T_STA_INDX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int storeLocation = 0x8012;
+
+	reset(cpu, mem);
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_STA_INDX;
+	mem->Data[0xFFFD] = 0xFD;
+	mem->Data[0x1E] = (storeLocation << 8) >> 8;
+	mem->Data[0x1F] = storeLocation >> 8;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_STA_INDX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation], cpu->A, "STA_INDX", hConsole);
+	NEW_TEST();
+
+}
+
+void T_STA_INDY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+	int storeLocation = 0x5476;
+
+	reset(cpu, mem);
+	cpu->Y = 0x21;
+	mem->Data[0xFFFC] = INS_LDA_INDY;
+	mem->Data[0xFFFD] = 0xFD;
+	mem->Data[0xFD] = (storeLocation << 8) >> 8;
+	mem->Data[0xFE] = storeLocation >> 8;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_LDA_INDY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[storeLocation + cpu->Y], cpu->A, "LDA_INDY_A", hConsole);
+	NEW_TEST();
+
+}

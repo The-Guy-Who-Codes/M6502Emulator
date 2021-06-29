@@ -53,6 +53,8 @@ int main() {
     T_STX_ZPY(&cpu, &mem, hConsole);
     T_STA_ABSX(&cpu, &mem, hConsole);
     T_STA_ABSY(&cpu, &mem, hConsole);
+    T_STA_INDX(&cpu, &mem, hConsole);
+    T_STA_INDY(&cpu, &mem, hConsole);
 
     return 0;
 }

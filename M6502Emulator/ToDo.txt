@@ -1,3 +1,13 @@
 [X] impliment loading functions
 [X] put all addressing modes into seperate functions
-[] impliment storing functions
+[X] impliment storing functions
+[X] impliment register transfers
+[] impliment logical operations
+[] impliment stack operations
+[] impliment arithmetic operations
+[] impliments binary shifts
+[] impliment jumps and calls
+[] impliments incriments and decriments
+[] impliment branches
+[] impliment status flag changes
+[] impliment system functions

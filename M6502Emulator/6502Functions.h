@@ -8,7 +8,7 @@ static inline void memInit(struct Mem* mem) { // initialises memory by resetting
 
 static inline void reset(struct CPU* cpu, struct Mem* mem) { // resets the state of the CPU as it were to be booted
     cpu->PC = 0xFFFC; // the reset vector in memory for the 6502 [https://www.c64-wiki.com/wiki/Reset_(Process)] 
-    cpu->SP = 0x00FF;
+    cpu->SP = 0x0100;
     cpu->D = 0; // clear decimal flag
     cpu->C = cpu->Z = cpu->I = cpu->B = cpu->O = cpu->N = 0; // clear all flag registers
     memInit(mem);
@@ -133,13 +133,13 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             cpu->Y = Value;
             setLoadFlags(cpu, &cpu->Y);
         } break;
-    
+
         case INS_LDA_ZP: {
             Byte ZPAddress = fetchByte(cycles, mem, cpu);
             cpu->A = readByte(cycles, mem, cpu, ZPAddress);
             setLoadFlags(cpu, &cpu->A);
         } break;
-        
+
         case INS_LDX_ZP: {
             Byte ZPAddress = fetchByte(cycles, mem, cpu);
             cpu->X = readByte(cycles, mem, cpu, ZPAddress);
@@ -224,7 +224,7 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             setLoadFlags(cpu, &cpu->A);
         } break;
 
-        /* Storing */
+            /* Storing */
 
         case INS_STA_ZP: {
             Byte Address = fetchByte(cycles, mem, cpu);
@@ -291,6 +291,48 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             Word Address = ABSY(cycles, mem, cpu);
             (*cycles)--;
             mem->Data[Address] = cpu->A;
+            (*cycles)--;
+        } break;
+
+        case INS_STA_INDX: {
+            Word Address = INDX(cycles, mem, cpu);
+            (*cycles)--;
+            mem->Data[Address] = cpu->A;
+            (*cycles)--;
+        } break;
+
+        case INS_STA_INDY: {
+            Word Address = INDY(cycles, mem, cpu);
+            (*cycles)--;
+            mem->Data[Address] = cpu->A;
+            (*cycles)--;
+        } break;
+
+        case INS_TAX_IMP: {
+            cpu->X = cpu->A;
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->X);
+            (*cycles)--;
+        } break;
+
+        case INS_TAY_IMP: {
+            cpu->Y = cpu->A;
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->Y);
+            (*cycles)--;
+        } break;
+
+        case INS_TXA_IMP: {
+            cpu->A = cpu->X;
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+            (*cycles)--;
+        } break;
+
+        case INS_TYA_IMP: {
+            cpu->A = cpu->Y;
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
             (*cycles)--;
         } break;
 
