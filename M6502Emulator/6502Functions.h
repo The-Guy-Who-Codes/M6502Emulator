@@ -8,9 +8,9 @@ static inline void memInit(struct Mem* mem) { // initialises memory by resetting
 
 static inline void reset(struct CPU* cpu, struct Mem* mem) { // resets the state of the CPU as it were to be booted
     cpu->PC = 0xFFFC; // the reset vector in memory for the 6502 [https://www.c64-wiki.com/wiki/Reset_(Process)] 
-    cpu->SP = 0x0100;
-    cpu->D = 0; // clear decimal flag
-    cpu->C = cpu->Z = cpu->I = cpu->B = cpu->O = cpu->N = 0; // clear all flag registers
+    cpu->SP = 0xFF;
+    cpu->Flag.D = 0; // clear decimal flag
+    cpu->Flag.C = cpu->Flag.Z = cpu->Flag.I = cpu->Flag.B = cpu->Flag.O = cpu->Flag.N = 0; // clear all flag registers
     memInit(mem);
 }
 
@@ -52,8 +52,8 @@ static inline void pageCrossedAddCycle(uint32_t* cycles, Word AddressOriginal, W
 }
 
 static inline void setLoadFlags(CPU* cpu, Byte* regValue) {
-    cpu->Z = (*regValue) == 0 ? 1 : 0; // set if A == 0 
-    cpu->N = (((*regValue) & (1 << 7)) >> 7); // set if Bit 7 of A is set
+    cpu->Flag.Z = (*regValue) == 0 ? 1 : 0; // set if A == 0 
+    cpu->Flag.N = (((*regValue) & (1 << 7)) >> 7); // set if Bit 7 of A is set
 }
 
 static inline Byte ZPX(uint32_t* cycles, Mem* mem, CPU* cpu) {
@@ -104,6 +104,16 @@ static inline Word INDY(uint32_t* cycles, Mem* mem, CPU* cpu) {
     Word Address = readWord(cycles, mem, cpu, baseAddress);
     Address += cpu->Y;
     return Address;
+}
+
+static inline Word SPAddress(Byte* SP) {
+    return SP + 0x0100;
+}
+
+static inline void stackPush(Byte value, uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
+    mem->Data[SPAddress(cpu->SP)] = value;
+    (*cycles)--;
+    cpu->SP--;
 }
 
 
@@ -308,32 +318,52 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             (*cycles)--;
         } break;
 
+            /* Register Transfers */
+
         case INS_TAX_IMP: {
             cpu->X = cpu->A;
-            (*cycles)--;
             setLoadFlags(cpu, &cpu->X);
             (*cycles)--;
         } break;
 
         case INS_TAY_IMP: {
             cpu->Y = cpu->A;
-            (*cycles)--;
             setLoadFlags(cpu, &cpu->Y);
             (*cycles)--;
         } break;
 
         case INS_TXA_IMP: {
             cpu->A = cpu->X;
-            (*cycles)--;
             setLoadFlags(cpu, &cpu->A);
             (*cycles)--;
         } break;
 
         case INS_TYA_IMP: {
             cpu->A = cpu->Y;
-            (*cycles)--;
             setLoadFlags(cpu, &cpu->A);
             (*cycles)--;
+        } break;
+
+            /* Stack Operations */
+
+        case INS_TSX_IMP: {
+            cpu->X = cpu->SP;
+            setLoadFlags(cpu, &cpu->X);
+            (*cycles)--;
+        } break;
+
+        case INS_TXS_IMP: {
+            cpu->SP = cpu->X;
+            (*cycles)--;
+        } break;
+
+        case INS_PHA_IMP: {
+            stackPush(cpu->A, cycles, cpu, mem);
+            (*cycles)--;
+        } break;
+
+        case INS_PHP_IMP: {
+            continue;
         } break;
 
         default: {

@@ -56,5 +56,17 @@ int main() {
     T_STA_INDX(&cpu, &mem, hConsole);
     T_STA_INDY(&cpu, &mem, hConsole);
 
+    T_TXA_IMP(&cpu, &mem, hConsole);
+    T_TYA_IMP(&cpu, &mem, hConsole);
+    T_TAX_IMP(&cpu, &mem, hConsole);
+    T_TAY_IMP(&cpu, &mem, hConsole);
+
+
+    T_TSX_IMP(&cpu, &mem, hConsole);
+    T_TXS_IMP(&cpu, &mem, hConsole);
+
+    T_PHA_IMP(&cpu, &mem, hConsole);
+
+
     return 0;
 }

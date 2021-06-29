@@ -17,8 +17,8 @@ void TestLoadFlags(struct CPU* cpu, HANDLE* hConsole, int Z, int N, char* prefix
 	strcat(strcpy(nameZ, prefix), "_Z");
 
 
-	TEST_EQ(cpu->N, N, nameN, hConsole);
-	TEST_EQ(cpu->Z, Z, nameZ, hConsole);
+	TEST_EQ(cpu->Flag.N, N, nameN, hConsole);
+	TEST_EQ(cpu->Flag.Z, Z, nameZ, hConsole);
 }
 
 /* Loading Tests */
@@ -571,6 +571,125 @@ void T_STA_INDY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	execute(&cycles, cpu, mem);
 
 	TEST_EQ(mem->Data[storeLocation + cpu->Y], cpu->A, "LDA_INDY_A", hConsole);
+	NEW_TEST();
+
+}
+
+/* Register Transfer Tests */
+
+void T_TXA_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->X = 0b0;
+	int Z = 1;
+	int N = 0;
+	mem->Data[0xFFFC] = INS_TXA_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_TXA_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, cpu->X, "TXA_IMP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "TXA_IMP");
+	NEW_TEST();
+
+}
+
+void T_TYA_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->Y = 0b00010101;
+	int Z = 0;
+	int N = 0;
+	mem->Data[0xFFFC] = INS_TYA_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_TYA_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, cpu->Y, "TYA_IMP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "TYA_IMP");
+	NEW_TEST();
+
+}
+
+void T_TAX_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->A = 0b10110101;
+	int Z = 0;
+	int N = 1;
+	mem->Data[0xFFFC] = INS_TAX_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_TAX_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->X, cpu->A, "TAX_IMP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "TAX_IMP");
+	NEW_TEST();
+
+}
+
+void T_TAY_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->A = 0b10011111;
+	int Z = 0;
+	int N = 1;
+	mem->Data[0xFFFC] = INS_TAY_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_TAY_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->Y, cpu->A, "TAY_IMP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "TAY_IMP");
+	NEW_TEST();
+
+}
+
+
+
+/* Stack Operation Tests */
+
+void T_TSX_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->X = 0b10001111;
+	int Z = 0;
+	int N = 1;
+	mem->Data[0xFFFC] = INS_TSX_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_TSX_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->X, cpu->SP, "TSX_IMP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "TXS_IMP");
+	NEW_TEST();
+
+}
+
+void T_TXS_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_TXS_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_TXS_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->X, cpu->SP, "TXS_IMP", hConsole);
+	NEW_TEST();
+
+}
+
+void T_PHA_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	cpu->A = 0x21;
+	mem->Data[0xFFFC] = INS_PHA_IMP;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_PHA_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(mem->Data[0x01FF], cpu->A, "PHA_IMP", hConsole);
 	NEW_TEST();
 
 }

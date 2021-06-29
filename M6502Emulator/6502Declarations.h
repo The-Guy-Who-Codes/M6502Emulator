@@ -56,6 +56,11 @@
 
 // Stack Operations
 #define INS_TSX_IMP 0xBA // copies contents of stack register into X register
+#define INS_TXS_IMP 0x9A // X --> SP
+
+#define INS_PHA_IMP 0x48 // push A to stack
+#define INS_PHP_IMP 0x08 // push processor status flags to the stack
+
 
 
 
@@ -67,13 +72,8 @@ typedef struct Mem {
 } Mem;
 
 
-typedef struct CPU {
-    // info about registers [http://www.obelisk.me.uk/6502/registers.html]
+struct StatusFlags {
 
-    Word PC; // program counter
-    Byte SP; // stack pointer
-
-    Byte A, X, Y; // registers
 
     // status flags using bit fields
     Byte C : 1; // carry
@@ -83,6 +83,25 @@ typedef struct CPU {
     Byte B : 1; // Break command
     Byte O : 1; // Overflow
     Byte N : 1; // negative
+
+};
+
+typedef struct CPU {
+    // info about registers [http://www.obelisk.me.uk/6502/registers.html]
+
+    Word PC; // program counter
+    Byte SP; // stack pointer
+
+    Byte A, X, Y; // registers
+
+    union {
+
+        Byte PS; // Processor status
+        struct StatusFlags Flag;
+    };
+    
+
+    
 
 
 } CPU;
@@ -98,10 +117,10 @@ static const uint8_t OPCODE_CYCLES[256] = {
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 5
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 6
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 7
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 2,  2,  0,  0,  0,  0, 0,  // 8
+        0, 0,  0,  0,  3,  0,  0,  0,  0, 2,  2,  0,  0,  0,  0, 0,  // 8
         0, 0,  0,  0,  0,  0,  0,  0,  0, 5,  2,  4,  0,  0,  0, 0,  // 9
-        0, 0,  0,  0,  0,  0,  0,  0,  2, 0,  2,  2,  0,  0,  0, 0,  // A
-        0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // B
+        0, 0,  0,  0,  0,  0,  0,  0,  2, 2,  2,  2,  0,  0,  0, 0,  // A
+        3, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // B
         0, 0,  0,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // C
         0, 0,  0,  0,  0,  0,  0,  0,  4, 5,  4,  4,  0,  0,  0, 0,  // D
         0, 0,  0,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // E
