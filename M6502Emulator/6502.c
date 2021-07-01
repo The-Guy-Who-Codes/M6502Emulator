@@ -73,7 +73,32 @@ int main() {
     T_AND_IM(&cpu, &mem, hConsole);
     T_AND_ZP(&cpu, &mem, hConsole);
     T_AND_ZPX(&cpu, &mem, hConsole);
+    T_AND_ABS(&cpu, &mem, hConsole);
+    T_AND_ABSX(&cpu, &mem, hConsole);
+    T_AND_ABSY(&cpu, &mem, hConsole);
+    T_AND_INDX(&cpu, &mem, hConsole);
+    T_AND_INDY(&cpu, &mem, hConsole);
 
+    T_EOR_IM(&cpu, &mem, hConsole);
+    T_EOR_ZP(&cpu, &mem, hConsole);
+    T_EOR_ZPX(&cpu, &mem, hConsole);
+    T_EOR_ABS(&cpu, &mem, hConsole);
+    T_EOR_ABSX(&cpu, &mem, hConsole);
+    T_EOR_ABSY(&cpu, &mem, hConsole);
+    T_EOR_INDX(&cpu, &mem, hConsole);
+    T_EOR_INDY(&cpu, &mem, hConsole);
+
+    T_ORA_IM(&cpu, &mem, hConsole);
+    T_ORA_ZP(&cpu, &mem, hConsole);
+    T_ORA_ZPX(&cpu, &mem, hConsole);
+    T_ORA_ABS(&cpu, &mem, hConsole);
+    T_ORA_ABSX(&cpu, &mem, hConsole);
+    T_ORA_ABSY(&cpu, &mem, hConsole);
+    T_ORA_INDX(&cpu, &mem, hConsole);
+    T_ORA_INDY(&cpu, &mem, hConsole);
+
+    T_BIT_ZP(&cpu, &mem, hConsole);
+    T_BIT_ABS(&cpu, &mem, hConsole);
 
     return 0;
 }

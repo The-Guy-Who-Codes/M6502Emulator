@@ -9,6 +9,9 @@ static inline void memInit(struct Mem* mem) { // initialises memory by resetting
 static inline void reset(struct CPU* cpu, struct Mem* mem) { // resets the state of the CPU as it were to be booted
     cpu->PC = 0xFFFC; // the reset vector in memory for the 6502 [https://www.c64-wiki.com/wiki/Reset_(Process)] 
     cpu->SP = 0xFF;
+
+    cpu->X = cpu->Y = cpu->A = 0;
+
     cpu->Flag.D = 0; // clear decimal flag
     cpu->Flag.C = cpu->Flag.Z = cpu->Flag.I = cpu->Flag.B = cpu->Flag.O = cpu->Flag.N = cpu->Flag.Ign = 0; // clear all flag registers
     memInit(mem);
@@ -405,6 +408,166 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             cpu->A = cpu->A & mem->Data[Address];
             (*cycles)--;
             setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_AND_ABS: {
+            Word Address = fetchWord(cycles, mem, cpu);
+            cpu->A = cpu->A & mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_AND_ABSX: {
+            Word Address = ABSX(cycles, mem, cpu);
+            cpu->A = cpu->A & mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_AND_ABSY: {
+            Word Address = ABSY(cycles, mem, cpu);
+            cpu->A = cpu->A & mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_AND_INDX: {
+            Word Address = INDX(cycles, mem, cpu);
+            (*cycles)--;
+            cpu->A = cpu->A & mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_AND_INDY: {
+            Word Address = INDY(cycles, mem, cpu);
+            cpu->A = cpu->A & mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_IM: {
+            cpu->A = cpu->A ^ fetchByte(cycles, mem, cpu);
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_ZP: {
+            cpu->A = cpu->A ^ mem->Data[fetchByte(cycles, mem, cpu)];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_ZPX: {
+            Byte Address = ZPX(cycles, mem, cpu);
+            cpu->A = cpu->A ^ mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_ABS: {
+            Word Address = fetchWord(cycles, mem, cpu);
+            cpu->A = cpu->A ^ mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_ABSX: {
+            Word Address = ABSX(cycles, mem, cpu);
+            cpu->A = cpu->A ^ mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_ABSY: {
+            Word Address = ABSY(cycles, mem, cpu);
+            cpu->A = cpu->A ^ mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_INDX: {
+            Word Address = INDX(cycles, mem, cpu);
+            (*cycles)--;
+            cpu->A = cpu->A ^ mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_EOR_INDY: {
+            Word Address = INDY(cycles, mem, cpu);
+            cpu->A = cpu->A ^ mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_IM: {
+            cpu->A = cpu->A | fetchByte(cycles, mem, cpu);
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_ZP: {
+            cpu->A = cpu->A | mem->Data[fetchByte(cycles, mem, cpu)];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_ZPX: {
+            Byte Address = ZPX(cycles, mem, cpu);
+            cpu->A = cpu->A | mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_ABS: {
+            Word Address = fetchWord(cycles, mem, cpu);
+            cpu->A = cpu->A | mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_ABSX: {
+            Word Address = ABSX(cycles, mem, cpu);
+            cpu->A = cpu->A | mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_ABSY: {
+            Word Address = ABSY(cycles, mem, cpu);
+            cpu->A = cpu->A | mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_INDX: {
+            Word Address = INDX(cycles, mem, cpu);
+            (*cycles)--;
+            cpu->A = cpu->A | mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_ORA_INDY: {
+            Word Address = INDY(cycles, mem, cpu);
+            cpu->A = cpu->A | mem->Data[Address];
+            (*cycles)--;
+            setLoadFlags(cpu, &cpu->A);
+        } break;
+
+        case INS_BIT_ZP: {
+            Byte Address = fetchByte(cycles, mem, cpu);
+            cpu->Flag.N = mem->Data[Address] >> 7;
+            cpu->Flag.O = (mem->Data[Address] << 1) >> 7;
+            cpu->Flag.Z = (mem->Data[Address] & cpu->A) == 0 ? 1 : 0;
+            (*cycles)--;
+        } break;
+
+        case INS_BIT_ABS: {
+            Word Address = fetchWord(cycles, mem, cpu);
+            cpu->Flag.N = mem->Data[Address] >> 7;
+            cpu->Flag.O = (mem->Data[Address] << 1) >> 7;
+            cpu->Flag.Z = (mem->Data[Address] & cpu->A) == 0 ? 1 : 0;
+            (*cycles)--;
         } break;
 
         default: {

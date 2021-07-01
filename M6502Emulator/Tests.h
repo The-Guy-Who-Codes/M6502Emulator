@@ -833,3 +833,567 @@ void T_AND_ZPX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	NEW_TEST();
 
 }
+
+void T_AND_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_AND_ABS;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3132] = value2;
+
+	// flags for after the operation
+	int Z = 0;
+	int N = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_ABS", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_ABS");
+	NEW_TEST();
+
+}
+
+void T_AND_ABSX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_AND_ABSX;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3153] = value2;
+
+	// flags for after the operation
+	int Z = 0;
+	int N = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_ABSX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_ABSX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_ABSX");
+	NEW_TEST();
+
+}
+
+void T_AND_ABSY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->Y = 0x21;
+	mem->Data[0xFFFC] = INS_AND_ABSY;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3153] = value2;
+
+	// flags for after the operation
+	int Z = 0;
+	int N = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_ABSY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_ABSY", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_ABSY");
+	NEW_TEST();
+
+}
+
+void T_AND_INDX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->X = 0x02;
+	mem->Data[0xFFFC] = INS_AND_INDX;
+	mem->Data[0xFFFD] = 0x30;
+	mem->Data[0x32] = 0x31;
+	mem->Data[0x33] = 0x54;
+	mem->Data[0x5431] = value2;
+
+	// flags for after the operation
+	int Z = 0;
+	int N = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_INDX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_INDX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_INDX");
+	NEW_TEST();
+
+}
+
+void T_AND_INDY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->Y = 0x02;
+	mem->Data[0xFFFC] = INS_AND_INDY;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = 0x31;
+	mem->Data[0x33] = 0x54;
+	mem->Data[0x5433] = value2;
+
+	// flags for after the operation
+	int Z = 0;
+	int N = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_AND_INDY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 & value2, "AND_INDY", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "AND_INDY");
+	NEW_TEST();
+
+}
+
+void T_EOR_IM(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b10010011;
+	Byte value2 = 0b10010110;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_EOR_IM;
+	mem->Data[0xFFFD] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_IM)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_IM", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_IM");
+	NEW_TEST();
+
+}
+
+void T_EOR_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b10101010;
+	Byte value2 = 0b01010101;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_EOR_ZP;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_ZP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_ZP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_ZP");
+	NEW_TEST();
+
+}
+
+void T_EOR_ZPX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b01011101;
+	cpu->A = value1;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_EOR_ZPX;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x53] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_ZPX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_ZPX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_ZPX");
+	NEW_TEST();
+
+}
+
+void T_EOR_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_EOR_ABS;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3132] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_ABS", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_ABS");
+	NEW_TEST();
+
+}
+
+void T_EOR_ABSX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_EOR_ABSX;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3153] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_ABSX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_ABSX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_ABSX");
+	NEW_TEST();
+
+}
+
+void T_EOR_ABSY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->Y = 0x21;
+	mem->Data[0xFFFC] = INS_EOR_ABSY;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3153] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_ABSY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_ABSY", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_ABSY");
+	NEW_TEST();
+
+}
+
+void T_EOR_INDX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->X = 0x02;
+	mem->Data[0xFFFC] = INS_EOR_INDX;
+	mem->Data[0xFFFD] = 0x30;
+	mem->Data[0x32] = 0x31;
+	mem->Data[0x33] = 0x54;
+	mem->Data[0x5431] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_INDX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_INDX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_INDX");
+	NEW_TEST();
+
+}
+
+void T_EOR_INDY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->Y = 0x02;
+	mem->Data[0xFFFC] = INS_EOR_INDY;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = 0x31;
+	mem->Data[0x33] = 0x54;
+	mem->Data[0x5433] = value2;
+
+	// flags for after the operation
+	int Z = (value1 ^ value2) == 0 ? 1 : 0;
+	int N = (((value1 ^ value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_EOR_INDY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 ^ value2, "EOR_INDY", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "EOR_INDY");
+	NEW_TEST();
+
+}
+
+void T_ORA_IM(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b10010011;
+	Byte value2 = 0b10010110;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_ORA_IM;
+	mem->Data[0xFFFD] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_IM)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_IM", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_IM");
+	NEW_TEST();
+
+}
+
+void T_ORA_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b10101010;
+	Byte value2 = 0b01010101;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_ORA_ZP;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_ZP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_ZP", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_ZP");
+	NEW_TEST();
+
+}
+
+void T_ORA_ZPX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b01011101;
+	cpu->A = value1;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_ORA_ZPX;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x53] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_ZPX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_ZPX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_ZPX");
+	NEW_TEST();
+
+}
+
+void T_ORA_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	mem->Data[0xFFFC] = INS_ORA_ABS;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3132] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_ABS", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_ABS");
+	NEW_TEST();
+
+}
+
+void T_ORA_ABSX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->X = 0x21;
+	mem->Data[0xFFFC] = INS_ORA_ABSX;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3153] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_ABSX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_ABSX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_ABSX");
+	NEW_TEST();
+
+}
+
+void T_ORA_ABSY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->Y = 0x21;
+	mem->Data[0xFFFC] = INS_ORA_ABSY;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x31;
+	mem->Data[0x3153] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_ABSY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_ABSY", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_ABSY");
+	NEW_TEST();
+
+}
+
+void T_ORA_INDX(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->X = 0x02;
+	mem->Data[0xFFFC] = INS_ORA_INDX;
+	mem->Data[0xFFFD] = 0x30;
+	mem->Data[0x32] = 0x31;
+	mem->Data[0x33] = 0x54;
+	mem->Data[0x5431] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_INDX)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_INDX", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_INDX");
+	NEW_TEST();
+
+}
+
+void T_ORA_INDY(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+	Byte value1 = 0b11101010;
+	Byte value2 = 0b11011101;
+	cpu->A = value1;
+	cpu->Y = 0x02;
+	mem->Data[0xFFFC] = INS_ORA_INDY;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = 0x31;
+	mem->Data[0x33] = 0x54;
+	mem->Data[0x5433] = value2;
+
+	// flags for after the operation
+	int Z = (value1 | value2) == 0 ? 1 : 0;
+	int N = (((value1 | value2) & (1 << 7)) >> 7);
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_ORA_INDY)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->A, value1 | value2, "ORA_INDY", hConsole);
+	TestLoadFlags(cpu, hConsole, Z, N, "ORA_INDY");
+	NEW_TEST();
+
+}
+
+void T_BIT_ZP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+
+	cpu->A = 0b10010010;
+	mem->Data[0xFFFC] = INS_BIT_ZP;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = 0b10010010;
+
+	// flags for after the operation
+	int Z = 0;
+	int N = 1;
+	int O = 0;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_BIT_ZP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->Flag.N, N, "BIT_ZP_N", hConsole);
+	TEST_EQ(cpu->Flag.Z, Z, "BIT_ZP_Z", hConsole);
+	TEST_EQ(cpu->Flag.O, O, "BIT_ZP_O", hConsole);
+	NEW_TEST();
+
+}
+
+void T_BIT_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+
+	cpu->A = 0b10101010;
+	mem->Data[0xFFFC] = INS_BIT_ABS;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0x32] = 0b01010101;
+
+	// flags for after the operation
+	int Z = 1;
+	int N = 0;
+	int O = 1;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_BIT_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->Flag.N, N, "BIT_ABS_N", hConsole);
+	TEST_EQ(cpu->Flag.Z, Z, "BIT_ABS_Z", hConsole);
+	TEST_EQ(cpu->Flag.O, O, "BIT_ABS_O", hConsole);
+	NEW_TEST();
+
+}

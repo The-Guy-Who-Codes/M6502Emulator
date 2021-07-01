@@ -67,8 +67,32 @@
 #define INS_AND_IM 0x29 // Logical AND with immediate addressing
 #define INS_AND_ZP 0x25
 #define INS_AND_ZPX 0x35
+#define INS_AND_ABS 0x2D
+#define INS_AND_ABSX 0x3D
+#define INS_AND_ABSY 0x39
+#define INS_AND_INDX 0x21
+#define INS_AND_INDY 0x31
 
+#define INS_EOR_IM 0x49 
+#define INS_EOR_ZP 0x45 
+#define INS_EOR_ZPX 0x55 
+#define INS_EOR_ABS 0x4D 
+#define INS_EOR_ABSX 0x5D 
+#define INS_EOR_ABSY 0x59 
+#define INS_EOR_INDX 0x41 
+#define INS_EOR_INDY 0x51 
 
+#define INS_ORA_IM 0x09
+#define INS_ORA_ZP 0x05 
+#define INS_ORA_ZPX 0x15 
+#define INS_ORA_ABS 0x0D 
+#define INS_ORA_ABSX 0x1D 
+#define INS_ORA_ABSY 0x19 
+#define INS_ORA_INDX 0x01 
+#define INS_ORA_INDY 0x11
+
+#define INS_BIT_ZP 0x24
+#define INS_BIT_ABS 0x2C
 
 
 
@@ -120,19 +144,19 @@ typedef struct CPU {
 static const uint8_t OPCODE_CYCLES[256] = {
     //  0  1   2   3   4   5   6   7   8  9   A   B   C   D   E  F
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 0
-        0, 0,  0,  0,  0,  0,  0,  0,  6, 6,  6,  5,  0,  0,  0, 0,  // 1
+        6, 5,  6,  5,  6,  5,  0,  0,  6, 6,  6,  5,  0,  0,  0, 0,  // 1
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  2,  0,  0,  0,  0, 0,  // 2
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 3
-        0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 4
-        0, 0,  3,  4,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 5
+        0, 0,  3,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 4
+        3, 4,  3,  4,  3,  4,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 5
         0, 0,  0,  0,  0,  0,  0,  0,  3, 4,  3,  4,  0,  0,  0, 0,  // 6
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // 7
         3, 0,  4,  0,  3,  0,  4,  0,  0, 2,  2,  0,  0,  0,  0, 0,  // 8
-        0, 0,  2,  0,  0,  0,  0,  0,  0, 5,  2,  4,  0,  0,  0, 0,  // 9
+        2, 4,  2,  4,  2,  4,  0,  0,  0, 5,  2,  4,  0,  0,  0, 0,  // 9
         0, 0,  0,  0,  0,  0,  0,  0,  2, 2,  2,  2,  0,  0,  0, 0,  // A
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // B
-        0, 0,  0,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // C
-        0, 0,  0,  0,  0,  0,  0,  0,  4, 5,  4,  4,  0,  0,  0, 0,  // D
+        0, 0,  4,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // C
+        4, 4,  4,  4,  4,  4,  0,  0,  4, 5,  4,  4,  0,  0,  0, 0,  // D
         0, 0,  0,  0,  0,  0,  0,  0,  4, 0,  4,  4,  0,  0,  0, 0,  // E
         0, 0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0, 0,  // F
 
