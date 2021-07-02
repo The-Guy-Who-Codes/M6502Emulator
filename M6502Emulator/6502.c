@@ -100,5 +100,10 @@ int main() {
     T_BIT_ZP(&cpu, &mem, hConsole);
     T_BIT_ABS(&cpu, &mem, hConsole);
 
+    T_JMP_ABS(&cpu, &mem, hConsole);
+    T_JMP_IND(&cpu, &mem, hConsole);
+    
+    T_JSR_IND(&cpu, &mem, hConsole);
+
     return 0;
 }

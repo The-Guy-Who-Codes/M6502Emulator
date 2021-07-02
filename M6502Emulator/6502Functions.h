@@ -122,9 +122,9 @@ static inline void stackPush(Byte value, uint32_t* cycles, struct CPU* cpu, stru
 }
 
 static inline void stackPull(Byte* reg, uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
-    *reg = mem->Data[SPAddress(cpu->SP)];
-    (*cycles)--;
     cpu->SP++;
+    (*cycles)--;
+    *reg = mem->Data[SPAddress(cpu->SP)];
     (*cycles)--;
 }
 
@@ -567,6 +567,35 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             cpu->Flag.N = mem->Data[Address] >> 7;
             cpu->Flag.O = (mem->Data[Address] << 1) >> 7;
             cpu->Flag.Z = (mem->Data[Address] & cpu->A) == 0 ? 1 : 0;
+            (*cycles)--;
+        } break;
+
+        /* Jumps and Calls */
+
+        case INS_JMP_ABS: {
+            cpu->PC = fetchWord(cycles, mem, cpu);
+        } break;
+
+        case INS_JMP_IND: {
+            Word BaseAddress = fetchWord(cycles, mem, cpu);
+            cpu->PC = readWord(cycles, mem, cpu, BaseAddress);
+        } break;
+
+        case INS_JSR_ABS: {
+            uint16_t PC = cpu->PC + 2;
+            stackPush(((PC - 1) << 8) >> 8, cycles, cpu, mem);
+            stackPush((PC - 1) >> 8, cycles, cpu, mem);
+            cpu->PC = fetchWord(cycles, mem, cpu);
+            (*cycles)--;
+        } break;
+
+        case INS_RTS_IMP: {
+            uint16_t PC;
+            stackPull(&PC, cycles, cpu, mem);
+            PC = PC << 8;
+            stackPull(&PC, cycles, cpu, mem);
+            cpu->PC = PC;
+            cpu->PC++;
             (*cycles)--;
         } break;
 

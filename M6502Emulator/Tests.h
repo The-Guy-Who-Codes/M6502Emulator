@@ -719,14 +719,14 @@ void T_PLA_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 
 	reset(cpu, mem);
 	mem->Data[0xFFFC] = INS_PLA_IMP;
-	mem->Data[0x01FF] = 0b10010011;
+	mem->Data[0x0100] = 0b10010011;
 	int Z = 0;
 	int N = 1;
 
 	int cycles = OPCODE_CYCLES[calcCycles(INS_PLA_IMP)];
 	execute(&cycles, cpu, mem);
 
-	TEST_EQ(cpu->A, mem->Data[0x01FF], "PLA_IMP", hConsole);
+	TEST_EQ(cpu->A, mem->Data[0x0100], "PLA_IMP", hConsole);
 	TestLoadFlags(cpu, hConsole, Z, N, "PLA_IMP");
 	NEW_TEST();
 
@@ -746,7 +746,7 @@ void T_PLP_IMP(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 #endif
 	cpu->PS = 0;
 	mem->Data[0xFFFC] = INS_PLP_IMP;
-	mem->Data[0x01FF] = 0b10101110;
+	mem->Data[0x0100] = 0b10101110;
 
 	int cycles = OPCODE_CYCLES[calcCycles(INS_PLP_IMP)];
 	execute(&cycles, cpu, mem);
@@ -1394,6 +1394,70 @@ void T_BIT_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
 	TEST_EQ(cpu->Flag.N, N, "BIT_ABS_N", hConsole);
 	TEST_EQ(cpu->Flag.Z, Z, "BIT_ABS_Z", hConsole);
 	TEST_EQ(cpu->Flag.O, O, "BIT_ABS_O", hConsole);
+	NEW_TEST();
+
+}
+
+/* Jumps and Calls Tests */
+
+void T_JMP_ABS(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+
+	mem->Data[0xFFFC] = INS_JMP_ABS;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x21;
+
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_JMP_ABS)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->PC, 0x2132, "BIT_JMP", hConsole);
+	NEW_TEST();
+
+}
+
+void T_JMP_IND(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+
+	mem->Data[0xFFFC] = INS_JMP_IND;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x21;
+	mem->Data[0x2132] = 0xF4;
+	mem->Data[0x2133] = 0x43;
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_JMP_IND)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->PC, 0x43F4, "BIT_IND", hConsole);
+	NEW_TEST();
+
+}
+
+void T_JSR_IND(struct CPU* cpu, struct Mem* mem, HANDLE* hConsole) {
+
+	reset(cpu, mem);
+
+	mem->Data[0xFFFC] = INS_JSR_ABS;
+	mem->Data[0xFFFD] = 0x32;
+	mem->Data[0xFFFE] = 0x21; // 0x2132
+	mem->Data[0x2132] = INS_LDA_IM;
+	mem->Data[0x2133] = 0b10110011;
+	mem->Data[0x2134] = INS_AND_IM;
+	mem->Data[0x2135] = 0b10110011;
+	mem->Data[0x2136] = INS_STA_ABS;
+	mem->Data[0x2137] = 0x32;
+	mem->Data[0x2138] = 0x54; // 0x5432
+	mem->Data[0x2139] = INS_RTS_IMP;
+
+
+
+	int cycles = OPCODE_CYCLES[calcCycles(INS_JSR_ABS)] + OPCODE_CYCLES[calcCycles(INS_LDA_IM)] + OPCODE_CYCLES[calcCycles(INS_AND_IM)] + OPCODE_CYCLES[calcCycles(INS_STA_ABS)] + OPCODE_CYCLES[calcCycles(INS_RTS_IMP)];
+	execute(&cycles, cpu, mem);
+
+	TEST_EQ(cpu->PC, 0xFFFF, "JSR_RTS_PC", hConsole);
+	TEST_EQ(mem->Data[0x5432], 0xB3, "JSR_RTS_AND", hConsole);
 	NEW_TEST();
 
 }
