@@ -6,7 +6,7 @@
 [X] impliment stack operations
 [] impliment arithmetic operations
 [] impliments binary shifts
-[] impliment jumps and calls
+[X] impliment jumps and calls
 [] impliments incriments and decriments
 [] impliment branches
 [] impliment status flag changes

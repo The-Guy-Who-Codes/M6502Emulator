@@ -599,6 +599,14 @@ void execute(uint32_t* cycles, struct CPU* cpu, struct Mem* mem) {
             (*cycles)--;
         } break;
 
+        /* Incriments and Decriments */
+
+        case INS_INC_ZP: {
+            Byte Address = fetchByte(cycles, mem, cpu);
+            mem->Data[Address]++;
+            setLoadFlags(cpu, &mem->Data[Address]);
+        } break;
+
         default: {
             printf("[ERROR]: Instruction Not Handled: %d\n\n", Instruction);
             *cycles = 0;
